@@ -49,7 +49,7 @@
         toggleBtn.title = "Toggle completion";
         toggleBtn.onclick = function(e) {
             e.stopPropagation();
-            RED.comms.publish("vikunja-tasks/toggle", { nodeId: nodeId, taskId: task.id });
+            console.log("Toggle clicked for task " + task.id);
         };
 
         const editBtn = document.createElement("button");
@@ -225,30 +225,6 @@
 
     RED.comms.subscribe("vikunja-tasks/remove", function(topic, msg) {
         removeTasks(msg.id);
-    });
-
-    RED.comms.subscribe("vikunja-tasks/toggle", function(topic, msg) {
-        RED.nodes.eachNode(function(node) {
-            if (node.type === "vikunja-tasks" && node.id === msg.nodeId) {
-                node.send({ payload: { action: "toggle", id: msg.taskId } });
-            }
-        });
-    });
-
-    RED.comms.subscribe("vikunja-tasks/delete", function(topic, msg) {
-        RED.nodes.eachNode(function(node) {
-            if (node.type === "vikunja-tasks" && node.id === msg.nodeId) {
-                node.send({ payload: { action: "delete", id: msg.taskId } });
-            }
-        });
-    });
-
-    RED.comms.subscribe("vikunja-tasks/edit", function(topic, msg) {
-        RED.nodes.eachNode(function(node) {
-            if (node.type === "vikunja-tasks" && node.id === msg.nodeId) {
-                node.send({ payload: { action: "edit", id: msg.taskId, data: msg.taskData } });
-            }
-        });
     });
 
 })();
