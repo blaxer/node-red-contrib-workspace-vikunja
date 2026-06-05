@@ -1,0 +1,365 @@
+<script type="text/javascript">
+
+(function() {
+
+    const taskElements = {};
+    const collapsedNodes = {};
+
+    function workspaceContainer() {
+        return document.querySelector("#red-ui-workspace-chart");
+    }
+
+    function createTaskWidget(nodeId, task, titleWidth) {
+        const key = nodeId + "-" + task.id;
+        if (taskElements[key]) return taskElements[key];
+
+        const table = document.createElement("table");
+        table.style.width = "100%";
+        table.style.borderCollapse = "collapse";
+        table.style.border = "1px solid #4A90E2";
+        table.style.borderRadius = "4px";
+        table.style.background = "#fff";
+        table.dataset.nodeId = nodeId;
+
+        const tr = document.createElement("tr");
+
+        const tdTitle = document.createElement("td");
+        tdTitle.style.padding = "6px 8px";
+        tdTitle.style.fontWeight = "bold";
+        tdTitle.style.color = "#333";
+        tdTitle.style.fontSize = "13px";
+        tdTitle.style.width = titleWidth + "px";
+        tdTitle.style.wordWrap = "break-word";
+        tdTitle.textContent = task.title || "";
+
+        const tdButtons = document.createElement("td");
+        tdButtons.style.padding = "6px 4px";
+        tdButtons.style.textAlign = "right";
+        tdButtons.style.whiteSpace = "nowrap";
+
+        const toggleBtn = document.createElement("button");
+        toggleBtn.style.background = "none";
+        toggleBtn.style.border = "1px solid #ddd";
+        toggleBtn.style.borderRadius = "3px";
+        toggleBtn.style.cursor = "pointer";
+        toggleBtn.style.fontSize = "12px";
+        toggleBtn.style.padding = "2px 6px";
+        toggleBtn.style.minWidth = "24px";
+        toggleBtn.innerHTML = "✓";
+        toggleBtn.title = "Toggle completion";
+        toggleBtn.onclick = function(e) {
+            e.stopPropagation();
+            RED.comms.publish("vikunja-tasks/toggle", { nodeId: nodeId, taskId: task.id });
+        };
+
+        const editBtn = document.createElement("button");
+        editBtn.style.background = "none";
+        editBtn.style.border = "1px solid #ddd";
+        editBtn.style.borderRadius = "3px";
+        editBtn.style.cursor = "pointer";
+        editBtn.style.fontSize = "12px";
+        editBtn.style.padding = "2px 6px";
+        editBtn.style.minWidth = "24px";
+        editBtn.innerHTML = "✎";
+        editBtn.title = "Edit task";
+        editBtn.onclick = function(e) {
+            e.stopPropagation();
+            RED.comms.publish("vikunja-tasks/edit", { nodeId: nodeId, taskId: task.id, taskData: task });
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.style.background = "none";
+        deleteBtn.style.border = "1px solid #ddd";
+        deleteBtn.style.borderRadius = "3px";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.style.fontSize = "12px";
+        deleteBtn.style.padding = "2px 6px";
+        deleteBtn.style.minWidth = "24px";
+        deleteBtn.innerHTML = "×";
+        deleteBtn.style.color = "#f44336";
+        deleteBtn.title = "Delete task";
+        deleteBtn.onclick = function(e) {
+            e.stopPropagation();
+            if (confirm("Delete this task?")) {
+                RED.comms.publish("vikunja-tasks/delete", { nodeId: nodeId, taskId: task.id });
+            }
+        };
+
+        tdButtons.appendChild(toggleBtn);
+        tdButtons.appendChild(editBtn);
+        tdButtons.appendChild(deleteBtn);
+
+        tr.appendChild(tdTitle);
+        tr.appendChild(tdButtons);
+        table.appendChild(tr);
+
+        taskElements[key] = { table, nodeId, taskId: task.id };
+        return taskElements[key];
+    }
+
+    function applyTasks(nodeId, tasksData, x, y, titleWidth, zIndex) {
+        const nodeTasks = tasksData || [];
+
+        document.querySelectorAll('[data-node-id="' + nodeId + '"]').forEach(el => el.remove());
+        Object.keys(taskElements).forEach(key => {
+            if (key.startsWith(nodeId + "-")) {
+                const el = taskElements[key];
+                if (el && el.table.parentNode) el.table.parentNode.removeChild(el.table);
+                delete taskElements[key];
+            }
+        });
+
+        if (nodeTasks.length === 0) return;
+
+        const container = document.createElement("div");
+        container.style.position = "absolute";
+        container.style.left = x + "px";
+        container.style.top = y + "px";
+        container.style.zIndex = zIndex;
+        container.style.minWidth = "300px";
+        container.style.border = "1px solid #4A90E2";
+        container.style.borderRadius = "4px";
+        container.style.background = "#fff";
+        container.dataset.nodeId = nodeId;
+
+        const header = document.createElement("div");
+        header.style.padding = "8px 12px";
+        header.style.background = "#4A90E2";
+        header.style.color = "#fff";
+        header.style.fontWeight = "bold";
+        header.style.fontSize = "12px";
+        header.style.borderBottom = "1px solid #357ab8";
+        header.style.cursor = "move";
+        header.textContent = "Vikunja Tasks";
+
+        const collapseBtn = document.createElement("button");
+        collapseBtn.style.background = "none";
+        collapseBtn.style.border = "1px solid rgba(255,255,255,0.5)";
+        collapseBtn.style.borderRadius = "3px";
+        collapseBtn.style.cursor = "pointer";
+        collapseBtn.style.fontSize = "12px";
+        collapseBtn.style.padding = "2px 6px";
+        collapseBtn.style.minWidth = "24px";
+        collapseBtn.innerHTML = collapsedNodes[nodeId] ? "▼" : "▲";
+        collapseBtn.title = "Toggle tasks";
+        collapseBtn.onclick = function(e) {
+            e.stopPropagation();
+            toggleCollapse(nodeId);
+        };
+
+        header.appendChild(collapseBtn);
+
+        const tasksContainer = document.createElement("div");
+        tasksContainer.style.display = "flex";
+        tasksContainer.style.flexDirection = "column";
+        tasksContainer.style.maxHeight = collapsedNodes[nodeId] ? "0" : "400px";
+        tasksContainer.style.overflow = collapsedNodes[nodeId] ? "hidden" : "visible";
+
+        nodeTasks.forEach((task, index) => {
+            const el = createTaskWidget(nodeId, task, titleWidth);
+            if (task.done) {
+                el.table.style.opacity = "0.7";
+                el.table.querySelector("td").style.textDecoration = "line-through";
+            }
+            tasksContainer.appendChild(el.table);
+        });
+
+        container.appendChild(header);
+        container.appendChild(tasksContainer);
+
+        let dragging = false;
+        let ox = 0, oy = 0;
+        header.addEventListener("mousedown", function(e) {
+            dragging = true;
+            ox = e.clientX - x;
+            oy = e.clientY - y;
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        document.addEventListener("mousemove", function(e) {
+            if (!dragging) return;
+            x = e.clientX - ox;
+            y = e.clientY - oy;
+            container.style.left = x + "px";
+            container.style.top = y + "px";
+        });
+        document.addEventListener("mouseup", function() {
+            dragging = false;
+        });
+
+        const workspace = document.querySelector("#red-ui-workspace-chart");
+        if (workspace) {
+            workspace.appendChild(container);
+        }
+    }
+
+    function toggleCollapse(nodeId) {
+        collapsedNodes[nodeId] = !collapsedNodes[nodeId];
+        const container = document.querySelector('[data-node-id="' + nodeId + '"]');
+        if (container) {
+            const tasksContainer = container.querySelector('div:last-child');
+            const collapseBtn = container.querySelector('div:first-child button');
+            if (tasksContainer) {
+                tasksContainer.style.maxHeight = collapsedNodes[nodeId] ? "0" : "400px";
+                tasksContainer.style.overflow = collapsedNodes[nodeId] ? "hidden" : "visible";
+            }
+            if (collapseBtn) {
+                collapseBtn.innerHTML = collapsedNodes[nodeId] ? "▼" : "▲";
+            }
+        }
+    }
+
+    function removeTasks(nodeId) {
+        Object.keys(taskElements).forEach(key => {
+            if (key.startsWith(nodeId + "-")) {
+                const el = taskElements[key];
+                if (el && el.table.parentNode) el.table.parentNode.removeChild(el.table);
+                delete taskElements[key];
+            }
+        });
+    }
+
+    RED.comms.subscribe("vikunja-tasks/update", function(topic, msg) {
+        applyTasks(msg.id, msg.tasks, msg.x, msg.y, msg.titleWidth || 200, msg.zIndex || 800);
+    });
+
+    RED.comms.subscribe("vikunja-tasks/remove", function(topic, msg) {
+        removeTasks(msg.id);
+    });
+
+    RED.comms.subscribe("vikunja-tasks/toggle", function(topic, msg) {
+        RED.nodes.eachNode(function(node) {
+            if (node.type === "vikunja-tasks" && node.id === msg.nodeId) {
+                node.send({ payload: { action: "toggle", id: msg.taskId } });
+            }
+        });
+    });
+
+    RED.comms.subscribe("vikunja-tasks/delete", function(topic, msg) {
+        RED.nodes.eachNode(function(node) {
+            if (node.type === "vikunja-tasks" && node.id === msg.nodeId) {
+                node.send({ payload: { action: "delete", id: msg.taskId } });
+            }
+        });
+    });
+
+    RED.comms.subscribe("vikunja-tasks/edit", function(topic, msg) {
+        RED.nodes.eachNode(function(node) {
+            if (node.type === "vikunja-tasks" && node.id === msg.nodeId) {
+                node.send({ payload: { action: "edit", id: msg.taskId, data: msg.taskData } });
+            }
+        });
+    });
+
+})();
+
+RED.nodes.registerType('vikunja-tasks', {
+    category: 'display',
+    color: '#4A90E2',
+    defaults: {
+        name: { value: "" },
+        vikunjaUrl: { value: "https://try.vikunja.io", required: true },
+        projectId: { value: "", required: true, validate: RED.validators.number() },
+        token: { value: "", required: true, type: "password" },
+        showCompleted: { value: false },
+        refreshInterval: { value: 0, validate: RED.validators.number() },
+        taskX: { value: 100 },
+        taskY: { value: 100 },
+        titleWidth: { value: 200 },
+        zIndex: { value: 800 }
+    },
+    inputs: 1,
+    outputs: 1,
+    label: function() {
+        return this.name || "Vikunja Tasks";
+    }
+});
+
+</script>
+
+<script type="text/html" data-template-name="vikunja-tasks">
+
+<div class="form-row">
+    <label>Name</label>
+    <input type="text" id="node-input-name">
+</div>
+
+<div class="form-row">
+    <label>URL</label>
+    <input type="text" id="node-input-vikunjaUrl" placeholder="https://try.vikunja.io">
+</div>
+
+<div class="form-row">
+    <label>Project ID</label>
+    <input type="number" id="node-input-projectId" placeholder="Project ID" min="1">
+</div>
+
+<div class="form-row">
+    <label>API Token</label>
+    <input type="password" id="node-input-token" placeholder="API Token">
+</div>
+
+<div class="form-row">
+    <input type="checkbox" id="node-input-showCompleted" style="display:inline-block;width:auto;margin-right:5px;">
+    <label for="node-input-showCompleted" style="width:auto;">Show Completed</label>
+</div>
+
+<div class="form-row">
+    <label>Refresh (min)</label>
+    <input type="number" id="node-input-refreshInterval" placeholder="0 = disabled" style="width:100px;" min="0">
+</div>
+
+<div class="form-row">
+    <label>Task Position X</label>
+    <input type="number" id="node-input-taskX" style="width:100px;">
+</div>
+
+<div class="form-row">
+    <label>Task Position Y</label>
+    <input type="number" id="node-input-taskY" style="width:100px;">
+</div>
+
+<div class="form-row">
+    <label>Title Width (px)</label>
+    <input type="number" id="node-input-titleWidth" style="width:100px;">
+    <label style="margin-left:10px;">Z-Index</label>
+    <input type="number" id="node-input-zIndex" style="width:80px;">
+</div>
+
+</script>
+
+<script type="text/html" data-help-name="vikunja-tasks">
+    <p>A Node-RED node to display and manage Vikunja tasks directly on the workspace.</p>
+    <h3>Features</h3>
+    <ul>
+        <li>Display tasks in a simple table on the Node-RED workspace canvas</li>
+        <li>Toggle task completion by clicking the widget</li>
+        <li>Edit task details</li>
+        <li>Delete tasks directly from the workspace</li>
+        <li>Drag the task container to reposition</li>
+        <li>Click the arrow to collapse/expand tasks</li>
+        <li>Auto-refresh support</li>
+    </ul>
+    <h3>Configuration</h3>
+    <ul>
+        <li><b>URL</b>: Your Vikunja server URL</li>
+        <li><b>Project ID</b>: ID of the project to display tasks from</li>
+        <li><b>API Token</b>: Your Vikunja API token</li>
+        <li><b>Show Completed</b>: Toggle to show/hide completed tasks</li>
+        <li><b>Refresh</b>: Auto-refresh interval in minutes (0 = disabled)</li>
+        <li><b>Task Position</b>: X/Y coordinates for task container</li>
+        <li><b>Title Width</b>: Width of the task title column in pixels</li>
+        <li><b>Z-Index</b>: Z-index for the task container (adjust if overlapping)</li>
+    </ul>
+    <h3>Input</h3>
+    <p>Accepts messages with <code>msg.payload</code> containing:</p>
+    <ul>
+        <li><code>'refresh'</code> - Force refresh tasks</li>
+        <li><code>{ action: 'add', title: '...' }</code> - Add new task</li>
+        <li><code>{ action: 'toggle', id: 123 }</code> - Toggle task completion</li>
+        <li><code>{ action: 'delete', id: 123 }</code> - Delete task</li>
+        <li><code>{ action: 'update', id: 123, data: {...} }</code> - Update task</li>
+    </ul>
+    <h3>Output</h3>
+    <p>The node sends messages with all tasks in <code>msg.payload</code>.</p>
+</script>

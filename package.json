@@ -1,0 +1,34 @@
+{
+  "name": "nodered-contrib-workspace-vikunja",
+  "version": "1.0.0",
+  "description": "Node-RED node to display and manage Vikunja tasks on the workspace",
+  "main": "node/vikunja-tasks.js",
+  "node-red": {
+    "nodes": {
+      "vikunja-tasks": "node/vikunja-tasks.js"
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node-red",
+    "vikunja",
+    "task",
+    "management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-red": "^3.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "homepage": ""
+}

@@ -1,0 +1,77 @@
+[
+    {
+        "id": "vikunja-tasks-1",
+        "type": "vikunja-tasks",
+        "z": "flow-1",
+        "name": "Vikunja Tasks",
+        "vikunjaUrl": "https://try.vikunja.io",
+        "projectId": "",
+        "token": "",
+        "showCompleted": false,
+        "refreshInterval": 0
+    },
+    {
+        "id": "inject-refresh",
+        "type": "inject",
+        "z": "flow-1",
+        "name": "Refresh",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "payload": "refresh",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": ""
+    },
+    {
+        "id": "inject-add",
+        "type": "inject",
+        "z": "flow-1",
+        "name": "Add Task",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "payload": "{\"action\":\"add\",\"title\":\"Test Task\",\"description\":\"This is a test task\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": ""
+    },
+    {
+        "id": "debug-tasks",
+        "type": "debug",
+        "z": "flow-1",
+        "name": "Tasks",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto"
+    },
+    {
+        "id": "link-in",
+        "type": "link in",
+        "z": "flow-1",
+        "name": "Link In",
+        "links": []
+    },
+    {
+        "id": "link-out",
+        "type": "link out",
+        "z": "flow-1",
+        "name": "Link Out",
+        "links": []
+    }
+]
