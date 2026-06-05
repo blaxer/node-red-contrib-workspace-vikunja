@@ -1,6 +1,6 @@
 # Vikunja Node-RED Node - Complete Project Plan
 
-## Current Status: Complete - Table Display Working
+## Current Status: v1.0.0 - Initial Release
 
 ### Completed
 - [x] Table displays on workspace using z-index configuration
@@ -10,6 +10,7 @@
 - [x] Filter by `done` field
 - [x] Configurable z-index to avoid overlapping UI
 - [x] Auto-refresh support
+- [x] No external dependencies (uses Node.js built-in http/https)
 
 ### Completed
 - [x] Created package.json with all dependencies (node-red)
