@@ -1,6 +1,6 @@
 # Vikunja Node-RED Node - Complete Project Plan
 
-## Current Status: v1.0.0 - Initial Release
+## Current Status: v1.0.0 - Initial Release (COMMIT: 92b96ca)
 
 ### Completed
 - [x] Table displays on workspace using z-index configuration
@@ -11,6 +11,14 @@
 - [x] Configurable z-index to avoid overlapping UI
 - [x] Auto-refresh support
 - [x] No external dependencies (uses Node.js built-in http/https)
+
+### Files
+- `node/vikunja-tasks.js` - Node runtime logic
+- `node/vikunja-tasks.html` - Node UI with workspace display
+- `node/lib/api.js` - API client (Node.js built-in http/https)
+- `package.json` - Package configuration
+- `PROJECT_PLAN.md` - This file
+- `README.md` - User documentation
 
 ### Completed
 - [x] Created package.json with all dependencies (node-red)
