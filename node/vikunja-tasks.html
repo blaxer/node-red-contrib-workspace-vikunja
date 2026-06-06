@@ -152,8 +152,10 @@
         return taskElements[key];
     }
 
-       function applyTasks(nodeId, state) {
+         function applyTasks(nodeId, state) {
+        console.log("applyTasks called for node:", nodeId, "state:", state);
         const nodeTasks = state.tasks || [];
+        const titleWidth = state.titleWidth || 200;
 
         document.querySelectorAll('[data-node-id="' + nodeId + '"]').forEach(el => el.remove());
         Object.keys(taskElements).forEach(key => {
@@ -323,24 +325,32 @@
 
     function updateVisibility(nodeId) {
         const container = document.querySelector('[data-node-id="' + nodeId + '"]');
+        console.log("updateVisibility for node:", nodeId, "container:", !!container);
         if (!container) return;
         
         const el = taskElements[nodeId];
+        console.log("taskElements[nodeId]:", el);
         if (!el || !el.container) return;
         
         if (!el.currentTabOnly) {
+            console.log("currentTabOnly is false, showing");
             el.container.style.display = "block";
             return;
         }
         
         const active = currentWorkspaceId();
-        el.container.style.display = (active === el.tabId) ? "block" : "none";
+        const shouldShow = (active === el.tabId);
+        console.log("active:", active, "tabId:", el.tabId, "shouldShow:", shouldShow);
+        el.container.style.display = shouldShow ? "block" : "none";
     }
 
-    function currentWorkspaceId() {
+      function currentWorkspaceId() {
         try {
-            return RED.workspaces.active();
+            const id = RED.workspaces.active();
+            console.log("currentWorkspaceId():", id);
+            return id;
         } catch(e) {
+            console.log("currentWorkspaceId error:", e);
             return null;
         }
     }
@@ -411,7 +421,7 @@
     }
 
       RED.comms.subscribe("vikunja-tasks/update", function(topic, msg) {
-        console.log("Received vikunja-tasks/update for node:", msg.id, "tasks:", msg.tasks.length);
+        console.log("Received vikunja-tasks/update:", msg.id, "showOnAllFlows:", msg.showOnAllFlows, "tabId:", msg.tabId, "currentTabOnly:", msg.currentTabOnly);
         applyTasks(msg.id, msg);
     });
 
