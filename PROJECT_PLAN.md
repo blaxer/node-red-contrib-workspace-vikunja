@@ -1,6 +1,6 @@
 # Vikunja Node-RED Node - Complete Project Plan
 
-## Current Status: v1.0.0 - Initial Release (COMMIT: 92b96ca)
+## Current Status: v1.0.3 - HTML Table Layout & Right-Aligned Add Button (COMMIT: 25db3aa)
 
 ### Completed
 - [x] Table displays on workspace using z-index configuration
@@ -326,7 +326,34 @@ Content-Type: application/json
 - **Input**: `refresh`, `add`, `toggle`, `delete`, `update`
 - **Output**: Task list array
 
-### Status: Complete - Tasks display on workspace canvas as interactive widgets
+### Status: v1.0.2 - Tasks display on workspace canvas with working admin endpoint and edit functionality
+
+**⚠️ CRITICAL: Admin Endpoint Pattern for HTML Button Actions**
+- HTML buttons MUST use `fetch()` to call admin endpoint `/vikunja-tasks/:id/action`
+- DO NOT use `RED.comms.publish()` from HTML - it won't reach node input handlers
+- Admin endpoint is the ONLY reliable way to get onclick events from HTML to node runtime
+- This pattern was discovered after nearly a full day of debugging
+
+**⚠️ CRITICAL: Vikunja API v1 Endpoints**
+- Use POST /tasks/{id} for task updates (not PUT or bulk endpoints)
+- POST /tasks/{id} with { "done": true } toggles completion
+- POST /tasks/{id} with { "title": "..." } updates task title
+- Use GET /projects/{id}/tasks to fetch tasks from a project
+
+**⚠️ CRITICAL: HTML Table Layout Best Practices**
+- When displaying interactive widgets on Node-RED workspace, use HTML TABLE elements (not divs)
+- Div-based layouts break the Node-RED editor design surface and create spacing issues
+- Use HTML deprecated `align="right"` attribute for table cell content alignment (not CSS textAlign)
+- Table cells with colspan work correctly with align="right"
+- Append table rows directly to tables, not to container divs
+
+**⚠️ CRITICAL: Git Best Practices**
+- NEVER run `git reset --hard` unless you're absolutely sure you want to discard changes
+- Running `git reset --hard HEAD~N` resets the branch pointer but commits still exist in reflog
+- Use `git log` to verify commits before resetting
+- Use `git reflog` to recover from accidental resets
+- Always check `git status` and `git log` before running reset commands
+
 - Uses RED.comms for frontend communication (same pattern as workspace-banner)
 - Tasks appear in a 2-column grid layout (name + 3 buttons)
 - Click to toggle completion, edit, or delete
@@ -335,3 +362,6 @@ Content-Type: application/json
 - Show completed tasks filter works
 - Auto-refresh support
 - Node status shows active task count
+- Admin endpoint working for all task actions (toggle, edit, delete)
+- HTML buttons use fetch API for task interactions
+- Debug logging for troubleshooting
