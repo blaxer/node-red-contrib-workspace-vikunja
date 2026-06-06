@@ -70,11 +70,14 @@
         editBtn.onclick = function(e) {
             e.stopPropagation();
             console.log("Edit clicked for task", task.id);
-            fetch("/vikunja-tasks/" + nodeId + "/action", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "edit", taskId: task.id, data: task })
-            }).then(r => r.json()).then(d => console.log("Edit result:", d));
+            const newTitle = prompt("Edit task title:", task.title);
+            if (newTitle !== null && newTitle.trim() !== "") {
+                fetch("/vikunja-tasks/" + nodeId + "/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "update", taskId: task.id, data: { title: newTitle.trim() } })
+                }).then(r => r.json()).then(d => console.log("Update result:", d)).catch(e => console.error("Update error:", e));
+            }
         };
 
         const deleteBtn = document.createElement("button");

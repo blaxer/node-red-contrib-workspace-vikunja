@@ -82,9 +82,9 @@ module.exports = function(RED) {
                 const postData = JSON.stringify(taskData);
                 return makeRequest({
                     path: `/api/v1/tasks/${taskId}`,
-                    method: 'PUT',
+                    method: 'POST',
                     headers: {
-                        'Content-Length': Buffer.byteLength(postData)
+                        'Content-Type': 'application/json'
                     }
                 }, postData);
             },
@@ -97,9 +97,10 @@ module.exports = function(RED) {
             },
 
            toggleTaskCompletion: function(taskId) {
+                // Vikunja API v1 supports POST /tasks/{id} for updates including toggling done
                 return makeRequest({
                     path: `/api/v1/tasks/${taskId}`,
-                    method: 'PUT',
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     }
