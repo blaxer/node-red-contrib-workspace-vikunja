@@ -1,6 +1,6 @@
 # Vikunja Node-RED Node - Complete Project Plan
 
-## Current Status: v1.0.3 - HTML Table Layout & Right-Aligned Add Button (COMMIT: 25db3aa)
+## Current Status: v1.0.4 - Header Table Layout & Button Padding (COMMIT: fb283f4)
 
 ### Completed
 - [x] Table displays on workspace using z-index configuration
@@ -11,6 +11,12 @@
 - [x] Configurable z-index to avoid overlapping UI
 - [x] Auto-refresh support
 - [x] No external dependencies (uses Node.js built-in http/https)
+- [x] Admin endpoint for task actions (toggle, edit, delete)
+- [x] Fixed syntax error in api.js (duplicate code)
+- [x] Edit button prompts for new title and updates task via API
+- [x] HTML table layout for header (not div) - prevents layout issues
+- [x] Right-aligned collapse and add buttons with HTML align attribute
+- [x] Added padding to buttons for proper spacing
 
 ### Files
 - `node/vikunja-tasks.js` - Node runtime logic
@@ -326,7 +332,7 @@ Content-Type: application/json
 - **Input**: `refresh`, `add`, `toggle`, `delete`, `update`
 - **Output**: Task list array
 
-### Status: v1.0.2 - Tasks display on workspace canvas with working admin endpoint and edit functionality
+### Status: v1.0.4 - Tasks display on workspace canvas with working admin endpoint, header table layout, and button padding
 
 **⚠️ CRITICAL: Admin Endpoint Pattern for HTML Button Actions**
 - HTML buttons MUST use `fetch()` to call admin endpoint `/vikunja-tasks/:id/action`
@@ -346,6 +352,7 @@ Content-Type: application/json
 - Use HTML deprecated `align="right"` attribute for table cell content alignment (not CSS textAlign)
 - Table cells with colspan work correctly with align="right"
 - Append table rows directly to tables, not to container divs
+- For header with title and button: use table with 2 cells - left for title, right for button
 
 **⚠️ CRITICAL: Git Best Practices**
 - NEVER run `git reset --hard` unless you're absolutely sure you want to discard changes
@@ -358,7 +365,7 @@ Content-Type: application/json
 - Tasks appear in a 2-column grid layout (name + 3 buttons)
 - Click to toggle completion, edit, or delete
 - Drag the task container to reposition
-- Collapse/expand tasks with arrow button
+- Collapse/expand tasks with arrow button (right-aligned in header table)
 - Show completed tasks filter works
 - Auto-refresh support
 - Node status shows active task count
