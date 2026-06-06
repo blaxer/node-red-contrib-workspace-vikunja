@@ -4,6 +4,7 @@
 
     const taskElements = {};
     const collapsedNodes = {};
+    const taskDescriptions = {};
 
     function workspaceContainer() {
         return document.querySelector("#red-ui-workspace-chart");
@@ -22,7 +23,8 @@
         table.style.borderSpacing = "0";
         table.dataset.nodeId = nodeId;
 
-        const tr = document.createElement("tr");
+         const tr = document.createElement("tr");
+        tr.style.border = "none";
 
         const tdTitle = document.createElement("td");
         tdTitle.style.padding = "6px 8px";
@@ -31,14 +33,36 @@
         tdTitle.style.fontSize = "13px";
         tdTitle.style.width = "100%";
         tdTitle.style.wordWrap = "break-word";
-        tdTitle.style.border = "1px solid #ddd";
+        tdTitle.style.border = "none";
+        tdTitle.style.cursor = "pointer";
         tdTitle.textContent = task.title || "";
+
+        const descriptionContainer = document.createElement("div");
+        descriptionContainer.style.padding = "0 8px";
+        descriptionContainer.style.margin = "4px 0";
+        descriptionContainer.style.fontSize = "12px";
+        descriptionContainer.style.color = "#666";
+        descriptionContainer.style.background = "#fafafa";
+        descriptionContainer.style.maxHeight = "0";
+        descriptionContainer.style.overflow = "hidden";
+        descriptionContainer.style.transition = "max-height 0.2s ease-out, padding 0.2s ease-out";
+        descriptionContainer.style.whiteSpace = "pre-wrap";
+        descriptionContainer.style.wordWrap = "break-word";
+        descriptionContainer.innerHTML = task.description || "";
+        taskDescriptions[key] = descriptionContainer;
+
+        tdTitle.addEventListener("click", function(e) {
+            e.stopPropagation();
+            console.log("Task title clicked for key:", key);
+            console.log("Description element:", taskDescriptions[key]);
+            toggleDescription(key);
+        });
 
         const tdButtons = document.createElement("td");
         tdButtons.style.padding = "6px 4px";
         tdButtons.style.textAlign = "right";
         tdButtons.style.whiteSpace = "nowrap";
-        tdButtons.style.border = "1px solid #ddd";
+        tdButtons.style.border = "none";
 
         const toggleBtn = document.createElement("button");
         toggleBtn.style.background = "none";
@@ -113,12 +137,22 @@
         tr.appendChild(tdTitle);
         tr.appendChild(tdButtons);
         table.appendChild(tr);
+        
+        if (task.description && task.description.trim() !== "") {
+            table.appendChild(descriptionContainer);
+            descriptionContainer.style.border = "1px solid #ddd";
+            descriptionContainer.style.borderTop = "none";
+            descriptionContainer.style.borderRadius = "0 0 4px 4px";
+            descriptionContainer.style.padding = "0 8px";
+        } else {
+            descriptionContainer.style.display = "none";
+        }
 
         taskElements[key] = { table, nodeId, taskId: task.id };
         return taskElements[key];
     }
 
-    function applyTasks(nodeId, tasksData, x, y, titleWidth, zIndex) {
+     function applyTasks(nodeId, tasksData, x, y, titleWidth, zIndex) {
         const nodeTasks = tasksData || [];
 
         document.querySelectorAll('[data-node-id="' + nodeId + '"]').forEach(el => el.remove());
@@ -127,6 +161,11 @@
                 const el = taskElements[key];
                 if (el && el.table.parentNode) el.table.parentNode.removeChild(el.table);
                 delete taskElements[key];
+            }
+        });
+        Object.keys(taskDescriptions).forEach(key => {
+            if (key.startsWith(nodeId + "-")) {
+                delete taskDescriptions[key];
             }
         });
 
@@ -290,12 +329,45 @@
         }
     }
 
+     function toggleDescription(key) {
+        const desc = taskDescriptions[key];
+        console.log("toggleDescription called with key:", key);
+        console.log("Description element found:", !!desc);
+        if (desc) {
+            console.log("Current maxHeight:", desc.style.maxHeight);
+            console.log("scrollHeight:", desc.scrollHeight);
+            if (desc.style.maxHeight === "0px" || desc.style.maxHeight === "") {
+                desc.style.maxHeight = desc.scrollHeight + "px";
+                setTimeout(() => {
+                    desc.style.maxHeight = "none";
+                }, 200);
+                desc.style.padding = "8px 8px";
+                console.log("Expanded description");
+            } else {
+                desc.style.maxHeight = desc.scrollHeight + "px";
+                desc.style.padding = "8px 8px";
+                setTimeout(() => {
+                    desc.style.maxHeight = "0";
+                    desc.style.padding = "0 8px";
+                }, 10);
+                console.log("Collapsed description");
+            }
+        } else {
+            console.error("No description found for key:", key);
+        }
+    }
+
     function removeTasks(nodeId) {
         Object.keys(taskElements).forEach(key => {
             if (key.startsWith(nodeId + "-")) {
                 const el = taskElements[key];
                 if (el && el.table.parentNode) el.table.parentNode.removeChild(el.table);
                 delete taskElements[key];
+            }
+        });
+        Object.keys(taskDescriptions).forEach(key => {
+            if (key.startsWith(nodeId + "-")) {
+                delete taskDescriptions[key];
             }
         });
     }
@@ -389,8 +461,11 @@ RED.nodes.registerType('vikunja-tasks', {
         <li>Delete tasks directly from the workspace</li>
         <li>Drag the task container to reposition</li>
         <li>Click the arrow to collapse/expand tasks</li>
+        <li>Click on a task title to expand/collapse its description</li>
         <li>Auto-refresh support</li>
     </ul>
+    <h3>Description</h3>
+    <p>Task descriptions are displayed in a collapsible section below each task title. Click on the task title to toggle the description view. Descriptions support HTML formatting including lists, paragraphs, and other rich text elements.</p>
     <h3>Configuration</h3>
     <ul>
         <li><b>URL</b>: Your Vikunja server URL</li>
