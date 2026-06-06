@@ -7,10 +7,11 @@ module.exports = function(RED) {
 
         const node = this;
 
-        // Load last position from context, or use defaults
-        const context = node.context();
-        const savedPos = context.get('position') || {};
-        console.log("[VIKUNJA] Loaded position from context:", savedPos);
+        // Load last position from flow context, or use defaults
+        const flowContext = node.context().flow;
+        const savedPos = flowContext.get(node.id + '_position') || {};
+        console.log("[VIKUNJA] Node ID:", node.id);
+        console.log("[VIKUNJA] Saved position from flow context:", savedPos);
         
         node.config = {
             url: config.vikunjaUrl,
@@ -166,8 +167,8 @@ module.exports = function(RED) {
         const node = RED.nodes.getNode(req.params.id);
         if (!node) return res.status(404).json({ error: "Node not found" });
 
-        const context = node.context();
-        context.set('position', { x: req.body.x, y: req.body.y });
+        // Save to flow context using node ID as key
+        node.context().flow.set(node.id + '_position', { x: req.body.x, y: req.body.y });
         res.json({ success: true });
     });
 };
