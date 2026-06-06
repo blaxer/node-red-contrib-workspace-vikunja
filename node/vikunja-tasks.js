@@ -10,6 +10,7 @@ module.exports = function(RED) {
         // Load last position from context, or use defaults
         const context = node.context();
         const savedPos = context.get('position') || {};
+        console.log("[VIKUNJA] Loaded position from context:", savedPos);
         
         node.config = {
             url: config.vikunjaUrl,
@@ -22,6 +23,7 @@ module.exports = function(RED) {
             titleWidth: Number(config.titleWidth || 200),
             zIndex: Number(config.zIndex || 800)
         };
+        console.log("[VIKUNJA] Config position:", node.config.taskX, node.config.taskY);
 
         node.tasks = [];
 
