@@ -140,16 +140,24 @@
         container.style.background = "#fff";
         container.dataset.nodeId = nodeId;
 
-        const header = document.createElement("div");
-        header.style.padding = "8px 12px";
-        header.style.background = "#4A90E2";
-        header.style.color = "#fff";
-        header.style.fontWeight = "bold";
-        header.style.fontSize = "12px";
-        header.style.borderBottom = "1px solid #357ab8";
-        header.style.cursor = "move";
-        header.textContent = "Vikunja Tasks";
-
+        const header = document.createElement("table");
+        header.style.width = "100%";
+        header.style.border = "none";
+        header.style.borderCollapse = "collapse";
+        
+        const headerRow = document.createElement("tr");
+        
+        const headerTitleCell = document.createElement("td");
+        headerTitleCell.style.padding = "8px 12px";
+        headerTitleCell.style.color = "#fff";
+        headerTitleCell.style.fontWeight = "bold";
+        headerTitleCell.style.fontSize = "12px";
+        headerTitleCell.textContent = "Vikunja Tasks";
+        
+        const headerBtnCell = document.createElement("td");
+        headerBtnCell.align = "right";
+        headerBtnCell.style.padding = "8px 0px 8px 12px";
+        
         const collapseBtn = document.createElement("button");
         collapseBtn.style.background = "none";
         collapseBtn.style.border = "1px solid rgba(255,255,255,0.5)";
@@ -158,14 +166,18 @@
         collapseBtn.style.fontSize = "12px";
         collapseBtn.style.padding = "2px 6px";
         collapseBtn.style.minWidth = "24px";
+        collapseBtn.style.color = "#fff";
         collapseBtn.innerHTML = collapsedNodes[nodeId] ? "▼" : "▲";
         collapseBtn.title = "Toggle tasks";
         collapseBtn.onclick = function(e) {
             e.stopPropagation();
             toggleCollapse(nodeId);
         };
-
-        header.appendChild(collapseBtn);
+        
+        headerBtnCell.appendChild(collapseBtn);
+        headerRow.appendChild(headerTitleCell);
+        headerRow.appendChild(headerBtnCell);
+        header.appendChild(headerRow);
 
         const tasksContainer = document.createElement("div");
         tasksContainer.style.display = "flex";
@@ -253,12 +265,12 @@
         }
     }
 
-    function toggleCollapse(nodeId) {
+     function toggleCollapse(nodeId) {
         collapsedNodes[nodeId] = !collapsedNodes[nodeId];
         const container = document.querySelector('[data-node-id="' + nodeId + '"]');
         if (container) {
             const tasksContainer = container.querySelector('div:last-child');
-            const collapseBtn = container.querySelector('div:first-child button');
+            const collapseBtn = container.querySelector('table:first-child td:last-child button');
             if (tasksContainer) {
                 tasksContainer.style.maxHeight = collapsedNodes[nodeId] ? "0" : "400px";
                 tasksContainer.style.overflow = collapsedNodes[nodeId] ? "hidden" : "visible";
