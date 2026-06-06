@@ -35,6 +35,7 @@ module.exports = function(RED) {
 
                 node.status({ fill: 'green', shape: 'dot', text: node.tasks.length + ' tasks' });
                 console.log("Vikunja: Publishing update with", node.tasks.length, "tasks");
+                console.log("Vikunja: First task:", JSON.stringify(node.tasks[0], null, 2));
 
                 RED.comms.publish("vikunja-tasks/update", {
                     id: node.id,
