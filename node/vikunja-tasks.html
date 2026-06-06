@@ -196,6 +196,9 @@
                 el.table.style.opacity = "0.7";
                 el.table.querySelector("td").style.textDecoration = "line-through";
             }
+            if (index % 2 === 1) {
+                el.table.style.background = "#f9f9f9";
+            }
             tasksContainer.appendChild(el.table);
         });
 
