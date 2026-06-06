@@ -182,7 +182,7 @@
             tasksContainer.appendChild(el.table);
         });
 
-        const addTaskRow = document.createElement("tr");
+         const addTaskRow = document.createElement("tr");
         addTaskRow.style.borderTop = "1px solid #ddd";
         
         const addTaskCell = document.createElement("td");
@@ -219,7 +219,11 @@
         
         addTaskCell.appendChild(addBtn);
         addTaskRow.appendChild(addTaskCell);
-        tasksContainer.appendChild(addTaskRow);
+        
+        const tables = tasksContainer.querySelectorAll("table");
+        if (tables.length > 0) {
+            tables[tables.length - 1].appendChild(addTaskRow);
+        }
 
         container.appendChild(header);
         container.appendChild(tasksContainer);
