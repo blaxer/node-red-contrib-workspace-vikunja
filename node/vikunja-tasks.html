@@ -260,10 +260,12 @@
         });
         document.addEventListener("mouseup", function() {
             dragging = false;
-            // Save position to node context
-            const context = node.context();
-            context.set('position', { x: x, y: y });
-            console.log("Position saved to context:", x, y);
+            // Save position to node context via backend API
+            fetch("/vikunja-tasks/" + nodeId + "/position", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ x: x, y: y })
+            }).then(r => r.json()).then(d => console.log("Position saved:", d)).catch(e => console.error("Position save error:", e));
         });
 
         const workspace = document.querySelector("#red-ui-workspace-chart");
