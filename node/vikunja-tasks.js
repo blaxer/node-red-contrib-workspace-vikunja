@@ -17,8 +17,8 @@ module.exports = function(RED) {
             token: config.token,
             showCompleted: config.showCompleted !== false,
             refreshInterval: Number(config.refreshInterval || 0),
-            taskX: Number(savedPos.x || config.taskX || 100),
-            taskY: Number(savedPos.y || config.taskY || 100),
+            taskX: Number(savedPos.x || 100),
+            taskY: Number(savedPos.y || 100),
             titleWidth: Number(config.titleWidth || 200),
             zIndex: Number(config.zIndex || 800)
         };
