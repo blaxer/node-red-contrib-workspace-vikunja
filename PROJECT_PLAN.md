@@ -1,6 +1,6 @@
 # Vikunja Node-RED Node - Complete Project Plan
 
-## Current Status: v1.0.4 - Header Table Layout & Button Padding (COMMIT: fb283f4)
+## Current Status: v1.0.5 - Table Column Widths & API Fix (COMMIT: 4067f6f)
 
 ### Completed
 - [x] Table displays on workspace using z-index configuration
@@ -8,15 +8,14 @@
 - [x] Collapse functionality added
 - [x] Drag functionality added
 - [x] Filter by `done` field
-- [x] Configurable z-index to avoid overlapping UI
 - [x] Auto-refresh support
 - [x] No external dependencies (uses Node.js built-in http/https)
-- [x] Admin endpoint for task actions (toggle, edit, delete)
-- [x] Fixed syntax error in api.js (duplicate code)
-- [x] Edit button prompts for new title and updates task via API
-- [x] HTML table layout for header (not div) - prevents layout issues
-- [x] Right-aligned collapse and add buttons with HTML align attribute
-- [x] Added padding to buttons for proper spacing
+- [x] Admin endpoint for task actions (toggle, edit, delete, add, update)
+- [x] Fixed task creation to use PUT method per Vikunja API spec
+- [x] Removed z-index configuration, hardcoded to 1000
+- [x] Fixed table column widths: first column 100%, second column auto
+- [x] Added grid lines to task table
+- [x] Removed debug console.log statements
 
 ### Files
 - `node/vikunja-tasks.js` - Node runtime logic
@@ -153,24 +152,32 @@ nodered-contrib-workspace-vikunja/
 - [x] Fixed showCompleted filter
 - [x] Fixed button display issues
 
-### Phase 3: Interaction ✅ COMPLETE
+### Phase 6: API Fix ✅ COMPLETE
+- [x] Changed task creation from POST to PUT per Vikunja API spec
+- [x] Removed manual Content-Length header
+
+### Phase 7: Interaction ✅ COMPLETE
 - [x] Implement click to toggle completion
 - [x] Add new task functionality
 - [x] Edit existing task functionality
 - [x] Delete task functionality
 
-### Phase 4: Polish ✅ COMPLETE
+### Phase 8: Polish ✅ COMPLETE
 - [x] Add refresh button
 - [x] Implement auto-refresh (optional)
 - [x] Add error handling and status indicators
 - [x] Add help documentation
 - [x] Create icons
 
-### Phase 5: Testing & Documentation ✅ COMPLETE
-- [ ] Write unit tests
-- [ ] Create README
-- [ ] Add usage examples
-- [ ] Test with real Vikunja instance
+### Phase 9: Code Cleanup ✅ COMPLETE
+- [x] Removed z-index configuration from node config
+- [x] Removed z-index input field from UI
+- [x] Removed z-index from help documentation
+
+### Phase 10: Table Layout Fix ✅ COMPLETE
+- [x] Set first column to 100% width
+- [x] Removed width from button column to auto-size
+- [x] Added border to all table cells for grid lines
 
 ---
 
@@ -180,11 +187,11 @@ nodered-contrib-workspace-vikunja/
 ```
 Base URL: {vikunja-url}/api/v1
 
-GET    /projects/{id}/tasks           - List tasks
-POST   /projects/{id}/tasks           - Create task
-PUT    /tasks/{id}                    - Update task
-DELETE /tasks/{id}                    - Delete task
-POST   /tasks/{id}/toggle-completion  - Toggle completion
+GET    /projects/{id}/tasks    - List tasks
+PUT    /projects/{id}/tasks    - Create task
+POST   /tasks/{id}             - Update task
+DELETE /tasks/{id}             - Delete task
+POST   /tasks/{id}             - Toggle completion (send done: true/false)
 ```
 
 ### Request Headers
@@ -332,7 +339,7 @@ Content-Type: application/json
 - **Input**: `refresh`, `add`, `toggle`, `delete`, `update`
 - **Output**: Task list array
 
-### Status: v1.0.4 - Tasks display on workspace canvas with working admin endpoint, header table layout, and button padding
+### Status: v1.0.5 - Table column widths fixed, z-index removed, grid lines added, PUT method for task creation
 
 **⚠️ CRITICAL: Admin Endpoint Pattern for HTML Button Actions**
 - HTML buttons MUST use `fetch()` to call admin endpoint `/vikunja-tasks/:id/action`
@@ -341,7 +348,7 @@ Content-Type: application/json
 - This pattern was discovered after nearly a full day of debugging
 
 **⚠️ CRITICAL: Vikunja API v1 Endpoints**
-- Use POST /tasks/{id} for task updates (not PUT or bulk endpoints)
+- Use PUT /projects/{id}/tasks to create new tasks (NOT POST)
 - POST /tasks/{id} with { "done": true } toggles completion
 - POST /tasks/{id} with { "title": "..." } updates task title
 - Use GET /projects/{id}/tasks to fetch tasks from a project
@@ -369,6 +376,8 @@ Content-Type: application/json
 - Show completed tasks filter works
 - Auto-refresh support
 - Node status shows active task count
-- Admin endpoint working for all task actions (toggle, edit, delete)
+- Admin endpoint working for all task actions (toggle, edit, delete, add, update)
 - HTML buttons use fetch API for task interactions
-- Debug logging for troubleshooting
+- Task creation uses PUT method per Vikunja API spec
+- Table layout: first column 100%, second column auto-sized
+- Grid lines visible on all table cells
