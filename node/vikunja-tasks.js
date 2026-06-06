@@ -53,6 +53,7 @@ module.exports = function(RED) {
         }
 
         function handleTaskAction(action, msg) {
+            console.log("[VIKUNJA] handleTaskAction called:", action, msg);
             switch(action) {
                 case 'refresh':
                     loadTasks();
@@ -72,34 +73,42 @@ module.exports = function(RED) {
                     }
                     break;
                 case 'toggle':
-                    if (msg.payload && msg.payload.id) {
+                    console.log("[VIKUNJA] Toggling task", msg.payload.taskId || msg.payload.id);
+                    const taskId = msg.payload.taskId || msg.payload.id;
+                    console.log("[VIKUNJA] Vikunja URL:", node.config.url);
+                    console.log("[VIKUNJA] Project ID:", node.config.projectId);
+                    if (msg.payload && taskId) {
                         const client = http.createClient({
                             url: node.config.url,
                             token: node.config.token
                         });
-                        client.toggleTaskCompletion(msg.payload.id)
+                        client.toggleTaskCompletion(taskId)
                             .then(() => loadTasks())
                             .catch(err => node.error('Failed to toggle task: ' + err.message));
                     }
                     break;
                 case 'delete':
-                    if (msg.payload && msg.payload.id) {
+                    const deleteTaskId = msg.payload.taskId || msg.payload.id;
+                    console.log("[VIKUNJA] Deleting task", deleteTaskId);
+                    if (msg.payload && deleteTaskId) {
                         const client = http.createClient({
                             url: node.config.url,
                             token: node.config.token
                         });
-                        client.deleteTask(msg.payload.id)
+                        client.deleteTask(deleteTaskId)
                             .then(() => loadTasks())
                             .catch(err => node.error('Failed to delete task: ' + err.message));
                     }
                     break;
                 case 'update':
-                    if (msg.payload && msg.payload.id && msg.payload.data) {
+                    const updateTaskId = msg.payload.taskId || msg.payload.id;
+                    console.log("[VIKUNJA] Updating task", updateTaskId);
+                    if (msg.payload && updateTaskId && msg.payload.data) {
                         const client = http.createClient({
                             url: node.config.url,
                             token: node.config.token
                         });
-                        client.updateTask(msg.payload.id, msg.payload.data)
+                        client.updateTask(updateTaskId, msg.payload.data)
                             .then(() => loadTasks())
                             .catch(err => node.error('Failed to update task: ' + err.message));
                     }
@@ -108,6 +117,9 @@ module.exports = function(RED) {
                     node.warn('Unknown action: ' + action);
             }
         }
+
+        // expose handleTaskAction for admin endpoint
+        node.handleTaskAction = handleTaskAction;
 
         this.on('input', function(msg) {
             if (msg.payload === 'refresh' || (msg.payload && typeof msg.payload === 'object' && msg.payload.action)) {
@@ -132,4 +144,14 @@ module.exports = function(RED) {
     }
 
     RED.nodes.registerType('vikunja-tasks', VikunjaTasksNode);
+
+    RED.httpAdmin.post("/vikunja-tasks/:id/action", function(req, res) {
+        console.log("[VIKUNJA] Admin API called:", req.params.id, req.body);
+        const node = RED.nodes.getNode(req.params.id);
+        console.log("[VIKUNJA] Node from getNode:", node);
+        if (!node) return res.status(404).json({ error: "Node not found" });
+
+        node.handleTaskAction(req.body.action, { payload: req.body });
+        res.json({ success: true });
+    });
 };
