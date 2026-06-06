@@ -152,31 +152,7 @@
         return taskElements[key];
     }
 
-     function currentWorkspaceId() {
-        try {
-            return RED.workspaces.active();
-        } catch(e) {
-            return null;
-        }
-    }
-
-    function updateVisibility(nodeId) {
-        const container = document.querySelector('[data-node-id="' + nodeId + '"]');
-        if (!container) return;
-        
-        const el = taskElements[nodeId];
-        if (!el || !el.container) return;
-        
-        if (!el.currentTabOnly) {
-            el.container.style.display = "block";
-            return;
-        }
-        
-        const active = currentWorkspaceId();
-        el.container.style.display = (active === el.tabId) ? "block" : "none";
-    }
-
-    function applyTasks(nodeId, tasksData, x, y, titleWidth, zIndex, showOnAllFlows) {
+       function applyTasks(nodeId, tasksData, x, y, titleWidth, zIndex, showOnAllFlows, tabId, currentTabOnly) {
         const nodeTasks = tasksData || [];
 
         document.querySelectorAll('[data-node-id="' + nodeId + '"]').forEach(el => el.remove());
@@ -342,11 +318,9 @@
         
         taskElements[nodeId] = {
             container: container,
-            tabId: currentWorkspaceId(),
+            tabId: tabId,
             currentTabOnly: !showOnAllFlows
         };
-        
-        updateVisibility(nodeId);
     }
 
      function toggleCollapse(nodeId) {
@@ -416,24 +390,11 @@
 
      RED.comms.subscribe("vikunja-tasks/update", function(topic, msg) {
         console.log("Received vikunja-tasks/update for node:", msg.id, "tasks:", msg.tasks.length);
-        applyTasks(msg.id, msg.tasks, msg.x, msg.y, msg.titleWidth || 200, 1000, msg.showOnAllFlows);
-    });
-
-    RED.comms.subscribe("vikunja-tasks/update-all", function(topic, msg) {
-        console.log("Received vikunja-tasks/update-all for node:", msg.id, "tasks:", msg.tasks.length);
-        applyTasks(msg.id, msg.tasks, msg.x, msg.y, msg.titleWidth || 200, 1000, msg.showOnAllFlows);
+        applyTasks(msg.id, msg.tasks, msg.x, msg.y, msg.titleWidth || 200, 1000, msg.showOnAllFlows, msg.tabId, msg.currentTabOnly);
     });
 
     RED.comms.subscribe("vikunja-tasks/remove", function(topic, msg) {
         removeTasks(msg.id);
-    });
-
-    RED.comms.subscribe("vikunja-tasks/remove-all", function(topic, msg) {
-        removeTasks(msg.id);
-    });
-
-    RED.events.on("workspace:change", function() {
-        Object.keys(taskElements).forEach(updateVisibility);
     });
 
 })();

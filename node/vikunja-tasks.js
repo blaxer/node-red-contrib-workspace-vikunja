@@ -18,6 +18,9 @@ module.exports = function(RED) {
             taskY: Number(config.taskY || 100),
             titleWidth: Number(config.titleWidth || 200)
         };
+
+        node.tasks = [];
+        node.tabId = node.z;
         console.log("Vikunja node initialized, showOnAllFlows:", node.config.showOnAllFlows);
 
         node.tasks = [];
@@ -35,7 +38,7 @@ module.exports = function(RED) {
                     ? tasks 
                     : tasks.filter(t => !t.done);
 
-           node.status({ fill: 'green', shape: 'dot', text: node.tasks.length + ' tasks' });
+            node.status({ fill: 'green', shape: 'dot', text: node.tasks.length + ' tasks' });
                 console.log("Vikunja: Publishing update with", node.tasks.length, "tasks for node", node.id, "showOnAllFlows:", node.config.showOnAllFlows);
 
                 const publishMsg = {
@@ -46,18 +49,11 @@ module.exports = function(RED) {
                     titleWidth: node.config.titleWidth,
                     zIndex: 1000,
                     showOnAllFlows: node.config.showOnAllFlows,
+                    tabId: node.tabId,
                     currentTabOnly: !node.config.showOnAllFlows
                 };
 
-                if (node.config.showOnAllFlows) {
-                    console.log("Publishing to update-all");
-                    RED.comms.publish("vikunja-tasks/update-all", publishMsg, true);
-                } else {
-                    console.log("Publishing to update");
-                    RED.comms.publish("vikunja-tasks/update", publishMsg, true);
-                }
-                
-                console.log("Current workspace:", RED.workspaces.active());
+                RED.comms.publish("vikunja-tasks/update", publishMsg, true);
 
             } catch (error) {
                 node.status({ fill: 'red', shape: 'dot', text: 'error' });
@@ -137,11 +133,7 @@ module.exports = function(RED) {
 
         this.on('close', function(removed, done) {
             const removeMsg = { id: node.id };
-            if (node.config.showOnAllFlows) {
-                RED.comms.publish("vikunja-tasks/remove-all", removeMsg, true);
-            } else {
-                RED.comms.publish("vikunja-tasks/remove", removeMsg, true);
-            }
+            RED.comms.publish("vikunja-tasks/remove", removeMsg, true);
             if (node.refreshTimer) clearInterval(node.refreshTimer);
             node.status({});
             if (removed) done();
