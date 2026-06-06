@@ -152,8 +152,8 @@
         return taskElements[key];
     }
 
-       function applyTasks(nodeId, tasksData, x, y, titleWidth, zIndex, showOnAllFlows, tabId, currentTabOnly) {
-        const nodeTasks = tasksData || [];
+       function applyTasks(nodeId, state) {
+        const nodeTasks = state.tasks || [];
 
         document.querySelectorAll('[data-node-id="' + nodeId + '"]').forEach(el => el.remove());
         Object.keys(taskElements).forEach(key => {
@@ -168,18 +168,14 @@
                 delete taskDescriptions[key];
             }
         });
-        
-        if (taskElements[nodeId]) {
-            delete taskElements[nodeId];
-        }
 
         if (nodeTasks.length === 0) return;
 
         const container = document.createElement("div");
         container.style.position = "absolute";
-        container.style.left = x + "px";
-        container.style.top = y + "px";
-        container.style.zIndex = zIndex;
+        container.style.left = state.x + "px";
+        container.style.top = state.y + "px";
+        container.style.zIndex = state.zIndex;
         container.style.minWidth = "300px";
         container.style.border = "1px solid #4A90E2";
         container.style.borderRadius = "4px";
@@ -311,16 +307,42 @@
             dragging = false;
         });
 
-         const workspace = document.querySelector("#red-ui-workspace-chart");
+          const workspace = document.querySelector("#red-ui-workspace-chart");
         if (workspace) {
             workspace.appendChild(container);
         }
         
         taskElements[nodeId] = {
             container: container,
-            tabId: tabId,
-            currentTabOnly: !showOnAllFlows
+            tabId: state.tabId,
+            currentTabOnly: state.currentTabOnly
         };
+        
+        updateVisibility(nodeId);
+    }
+
+    function updateVisibility(nodeId) {
+        const container = document.querySelector('[data-node-id="' + nodeId + '"]');
+        if (!container) return;
+        
+        const el = taskElements[nodeId];
+        if (!el || !el.container) return;
+        
+        if (!el.currentTabOnly) {
+            el.container.style.display = "block";
+            return;
+        }
+        
+        const active = currentWorkspaceId();
+        el.container.style.display = (active === el.tabId) ? "block" : "none";
+    }
+
+    function currentWorkspaceId() {
+        try {
+            return RED.workspaces.active();
+        } catch(e) {
+            return null;
+        }
     }
 
      function toggleCollapse(nodeId) {
@@ -388,13 +410,17 @@
         }
     }
 
-     RED.comms.subscribe("vikunja-tasks/update", function(topic, msg) {
+      RED.comms.subscribe("vikunja-tasks/update", function(topic, msg) {
         console.log("Received vikunja-tasks/update for node:", msg.id, "tasks:", msg.tasks.length);
-        applyTasks(msg.id, msg.tasks, msg.x, msg.y, msg.titleWidth || 200, 1000, msg.showOnAllFlows, msg.tabId, msg.currentTabOnly);
+        applyTasks(msg.id, msg);
     });
 
     RED.comms.subscribe("vikunja-tasks/remove", function(topic, msg) {
         removeTasks(msg.id);
+    });
+
+    RED.events.on("workspace:change", function() {
+        Object.keys(taskElements).forEach(updateVisibility);
     });
 
 })();

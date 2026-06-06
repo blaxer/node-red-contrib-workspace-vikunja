@@ -21,7 +21,22 @@ module.exports = function(RED) {
 
         node.tasks = [];
         node.tabId = node.z;
-        console.log("Vikunja node initialized, showOnAllFlows:", node.config.showOnAllFlows);
+        node.showOnAllFlows = config.showOnAllFlows || false;
+
+        function publishState() {
+            const publishMsg = {
+                id: node.id,
+                tasks: node.tasks,
+                x: node.config.taskX,
+                y: node.config.taskY,
+                titleWidth: node.config.titleWidth,
+                zIndex: 1000,
+                showOnAllFlows: node.showOnAllFlows,
+                tabId: node.tabId,
+                currentTabOnly: !node.showOnAllFlows
+            };
+            RED.comms.publish("vikunja-tasks/update", publishMsg, true);
+        }
 
         node.tasks = [];
 
@@ -39,21 +54,8 @@ module.exports = function(RED) {
                     : tasks.filter(t => !t.done);
 
             node.status({ fill: 'green', shape: 'dot', text: node.tasks.length + ' tasks' });
-                console.log("Vikunja: Publishing update with", node.tasks.length, "tasks for node", node.id, "showOnAllFlows:", node.config.showOnAllFlows);
 
-                const publishMsg = {
-                    id: node.id,
-                    tasks: node.tasks,
-                    x: node.config.taskX,
-                    y: node.config.taskY,
-                    titleWidth: node.config.titleWidth,
-                    zIndex: 1000,
-                    showOnAllFlows: node.config.showOnAllFlows,
-                    tabId: node.tabId,
-                    currentTabOnly: !node.config.showOnAllFlows
-                };
-
-                RED.comms.publish("vikunja-tasks/update", publishMsg, true);
+                publishState();
 
             } catch (error) {
                 node.status({ fill: 'red', shape: 'dot', text: 'error' });
@@ -145,6 +147,8 @@ module.exports = function(RED) {
         if (node.config.refreshInterval > 0) {
             node.refreshTimer = setInterval(loadTasks, node.config.refreshInterval * 60000);
         }
+        
+        publishState();
     }
 
     RED.nodes.registerType('vikunja-tasks', VikunjaTasksNode);
