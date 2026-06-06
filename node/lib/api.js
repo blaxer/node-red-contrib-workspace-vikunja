@@ -96,11 +96,14 @@ module.exports = function(RED) {
                 });
             },
 
-            toggleTaskCompletion: function(taskId) {
+           toggleTaskCompletion: function(taskId) {
                 return makeRequest({
-                    path: `/api/v1/tasks/${taskId}/toggle-completion`,
-                    method: 'POST'
-                });
+                    path: `/api/v1/tasks/${taskId}`,
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }, JSON.stringify({ done: true }));
             }
         };
     }
