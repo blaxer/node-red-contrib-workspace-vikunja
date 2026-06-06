@@ -7,14 +7,18 @@ module.exports = function(RED) {
 
         const node = this;
 
+        // Load last position from context, or use defaults
+        const context = node.context();
+        const savedPos = context.get('position') || {};
+        
         node.config = {
             url: config.vikunjaUrl,
             projectId: config.projectId,
             token: config.token,
             showCompleted: config.showCompleted !== false,
             refreshInterval: Number(config.refreshInterval || 0),
-            taskX: Number(config.taskX || 100),
-            taskY: Number(config.taskY || 100),
+            taskX: Number(savedPos.x || config.taskX || 100),
+            taskY: Number(savedPos.y || config.taskY || 100),
             titleWidth: Number(config.titleWidth || 200),
             zIndex: Number(config.zIndex || 800)
         };
@@ -152,6 +156,16 @@ module.exports = function(RED) {
         if (!node) return res.status(404).json({ error: "Node not found" });
 
         node.handleTaskAction(req.body.action, { payload: req.body });
+        res.json({ success: true });
+    });
+
+    RED.httpAdmin.post("/vikunja-tasks/:id/position", function(req, res) {
+        console.log("[VIKUNJA] Position update:", req.params.id, req.body);
+        const node = RED.nodes.getNode(req.params.id);
+        if (!node) return res.status(404).json({ error: "Node not found" });
+
+        const context = node.context();
+        context.set('position', { x: req.body.x, y: req.body.y });
         res.json({ success: true });
     });
 };
