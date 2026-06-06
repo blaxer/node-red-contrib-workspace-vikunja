@@ -15,8 +15,7 @@ module.exports = function(RED) {
             refreshInterval: Number(config.refreshInterval || 0),
             taskX: Number(config.taskX || 100),
             taskY: Number(config.taskY || 100),
-            titleWidth: Number(config.titleWidth || 200),
-            zIndex: Number(config.zIndex || 800)
+            titleWidth: Number(config.titleWidth || 200)
         };
 
         node.tasks = [];
@@ -43,7 +42,7 @@ module.exports = function(RED) {
                     x: node.config.taskX,
                     y: node.config.taskY,
                     titleWidth: node.config.titleWidth,
-                    zIndex: node.config.zIndex
+                    zIndex: 1000
                 }, true);
 
             } catch (error) {

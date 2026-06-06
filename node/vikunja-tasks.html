@@ -295,7 +295,7 @@
     }
 
     RED.comms.subscribe("vikunja-tasks/update", function(topic, msg) {
-        applyTasks(msg.id, msg.tasks, msg.x, msg.y, msg.titleWidth || 200, msg.zIndex || 800);
+        applyTasks(msg.id, msg.tasks, msg.x, msg.y, msg.titleWidth || 200, 1000);
     });
 
     RED.comms.subscribe("vikunja-tasks/remove", function(topic, msg) {
@@ -315,7 +315,6 @@ RED.nodes.registerType('vikunja-tasks', {
         showCompleted: { value: false },
         refreshInterval: { value: 0, validate: RED.validators.number() },
         titleWidth: { value: 200 },
-        zIndex: { value: 800 },
         taskX: { value: 100 },
         taskY: { value: 100 }
     },
@@ -370,8 +369,6 @@ RED.nodes.registerType('vikunja-tasks', {
 <div class="form-row">
     <label>Title Width (px)</label>
     <input type="number" id="node-input-titleWidth" style="width:100px;">
-    <label style="margin-left:10px;">Z-Index</label>
-    <input type="number" id="node-input-zIndex" style="width:80px;">
 </div>
 
 </script>
@@ -397,7 +394,6 @@ RED.nodes.registerType('vikunja-tasks', {
         <li><b>Refresh</b>: Auto-refresh interval in minutes (0 = disabled)</li>
         <li><b>Task Position</b>: X/Y coordinates for task container</li>
         <li><b>Title Width</b>: Width of the task title column in pixels</li>
-        <li><b>Z-Index</b>: Z-index for the task container (adjust if overlapping)</li>
     </ul>
     <h3>Input</h3>
     <p>Accepts messages with <code>msg.payload</code> containing:</p>
