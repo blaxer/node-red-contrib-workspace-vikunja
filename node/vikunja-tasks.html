@@ -320,8 +320,6 @@ RED.nodes.registerType('vikunja-tasks', {
         token: { value: "", required: true, type: "password" },
         showCompleted: { value: false },
         refreshInterval: { value: 0, validate: RED.validators.number() },
-        taskX: { value: 100 },
-        taskY: { value: 100 },
         titleWidth: { value: 200 },
         zIndex: { value: 800 }
     },
@@ -364,16 +362,6 @@ RED.nodes.registerType('vikunja-tasks', {
 <div class="form-row">
     <label>Refresh (min)</label>
     <input type="number" id="node-input-refreshInterval" placeholder="0 = disabled" style="width:100px;" min="0">
-</div>
-
-<div class="form-row">
-    <label>Task Position X</label>
-    <input type="number" id="node-input-taskX" style="width:100px;">
-</div>
-
-<div class="form-row">
-    <label>Task Position Y</label>
-    <input type="number" id="node-input-taskY" style="width:100px;">
 </div>
 
 <div class="form-row">
