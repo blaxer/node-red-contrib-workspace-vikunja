@@ -7,24 +7,17 @@ module.exports = function(RED) {
 
         const node = this;
 
-        // Load last position from flow context, or use defaults
-        const flowContext = node.context().flow;
-        const savedPos = flowContext.get(node.id + '_position') || {};
-        console.log("[VIKUNJA] Node ID:", node.id);
-        console.log("[VIKUNJA] Saved position from flow context:", savedPos);
-        
         node.config = {
             url: config.vikunjaUrl,
             projectId: config.projectId,
             token: config.token,
             showCompleted: config.showCompleted !== false,
             refreshInterval: Number(config.refreshInterval || 0),
-            taskX: Number(savedPos.x || 100),
-            taskY: Number(savedPos.y || 100),
+            taskX: Number(config.taskX || 100),
+            taskY: Number(config.taskY || 100),
             titleWidth: Number(config.titleWidth || 200),
             zIndex: Number(config.zIndex || 800)
         };
-        console.log("[VIKUNJA] Config position:", node.config.taskX, node.config.taskY);
 
         node.tasks = [];
 
@@ -60,7 +53,6 @@ module.exports = function(RED) {
         }
 
         function handleTaskAction(action, msg) {
-            console.log("[VIKUNJA] handleTaskAction called:", action, msg);
             switch(action) {
                 case 'refresh':
                     loadTasks();
@@ -80,10 +72,7 @@ module.exports = function(RED) {
                     }
                     break;
                 case 'toggle':
-                    console.log("[VIKUNJA] Toggling task", msg.payload.taskId || msg.payload.id);
                     const taskId = msg.payload.taskId || msg.payload.id;
-                    console.log("[VIKUNJA] Vikunja URL:", node.config.url);
-                    console.log("[VIKUNJA] Project ID:", node.config.projectId);
                     if (msg.payload && taskId) {
                         const client = http.createClient({
                             url: node.config.url,
@@ -96,7 +85,6 @@ module.exports = function(RED) {
                     break;
                 case 'delete':
                     const deleteTaskId = msg.payload.taskId || msg.payload.id;
-                    console.log("[VIKUNJA] Deleting task", deleteTaskId);
                     if (msg.payload && deleteTaskId) {
                         const client = http.createClient({
                             url: node.config.url,
@@ -109,7 +97,6 @@ module.exports = function(RED) {
                     break;
                 case 'update':
                     const updateTaskId = msg.payload.taskId || msg.payload.id;
-                    console.log("[VIKUNJA] Updating task", updateTaskId);
                     if (msg.payload && updateTaskId && msg.payload.data) {
                         const client = http.createClient({
                             url: node.config.url,
@@ -153,22 +140,10 @@ module.exports = function(RED) {
     RED.nodes.registerType('vikunja-tasks', VikunjaTasksNode);
 
     RED.httpAdmin.post("/vikunja-tasks/:id/action", function(req, res) {
-        console.log("[VIKUNJA] Admin API called:", req.params.id, req.body);
         const node = RED.nodes.getNode(req.params.id);
-        console.log("[VIKUNJA] Node from getNode:", node);
         if (!node) return res.status(404).json({ error: "Node not found" });
 
         node.handleTaskAction(req.body.action, { payload: req.body });
-        res.json({ success: true });
-    });
-
-    RED.httpAdmin.post("/vikunja-tasks/:id/position", function(req, res) {
-        console.log("[VIKUNJA] Position update:", req.params.id, req.body);
-        const node = RED.nodes.getNode(req.params.id);
-        if (!node) return res.status(404).json({ error: "Node not found" });
-
-        // Save to flow context using node ID as key
-        node.context().flow.set(node.id + '_position', { x: req.body.x, y: req.body.y });
         res.json({ success: true });
     });
 };
