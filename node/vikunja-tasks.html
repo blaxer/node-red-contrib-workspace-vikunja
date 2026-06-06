@@ -182,6 +182,45 @@
             tasksContainer.appendChild(el.table);
         });
 
+        const addTaskRow = document.createElement("tr");
+        addTaskRow.style.borderTop = "1px solid #ddd";
+        
+        const addTaskCell = document.createElement("td");
+        addTaskCell.colSpan = 2;
+        addTaskCell.style.padding = "6px";
+        addTaskCell.style.textAlign = "right";
+        
+        const addBtn = document.createElement("button");
+        addBtn.style.background = "#4A90E2";
+        addBtn.style.color = "#fff";
+        addBtn.style.border = "1px solid #357ab8";
+        addBtn.style.borderRadius = "50%";
+        addBtn.style.width = "28px";
+        addBtn.style.height = "28px";
+        addBtn.style.fontSize = "16px";
+        addBtn.style.fontWeight = "bold";
+        addBtn.style.cursor = "pointer";
+        addBtn.style.display = "flex";
+        addBtn.style.alignItems = "center";
+        addBtn.style.justifyContent = "center";
+        addBtn.title = "Add new task";
+        addBtn.innerHTML = "+";
+        addBtn.onclick = function(e) {
+            e.stopPropagation();
+            const newTitle = prompt("Enter new task title:");
+            if (newTitle !== null && newTitle.trim() !== "") {
+                fetch("/vikunja-tasks/" + nodeId + "/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "add", title: newTitle.trim(), description: "" })
+                }).then(r => r.json()).then(d => console.log("Add task result:", d)).catch(e => console.error("Add task error:", e));
+            }
+        };
+        
+        addTaskCell.appendChild(addBtn);
+        addTaskRow.appendChild(addTaskCell);
+        tasksContainer.appendChild(addTaskRow);
+
         container.appendChild(header);
         container.appendChild(tasksContainer);
 
