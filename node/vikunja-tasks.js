@@ -7,7 +7,7 @@ module.exports = function(RED) {
 
         const node = this;
 
-        node.config = {
+         node.config = {
             url: config.vikunjaUrl,
             projectId: config.projectId,
             token: config.token,
@@ -18,6 +18,7 @@ module.exports = function(RED) {
             taskY: Number(config.taskY || 100),
             titleWidth: Number(config.titleWidth || 200)
         };
+        console.log("Vikunja node initialized, showOnAllFlows:", node.config.showOnAllFlows);
 
         node.tasks = [];
 
@@ -34,8 +35,8 @@ module.exports = function(RED) {
                     ? tasks 
                     : tasks.filter(t => !t.done);
 
-              node.status({ fill: 'green', shape: 'dot', text: node.tasks.length + ' tasks' });
-                console.log("Vikunja: Publishing update with", node.tasks.length, "tasks for node", node.id);
+           node.status({ fill: 'green', shape: 'dot', text: node.tasks.length + ' tasks' });
+                console.log("Vikunja: Publishing update with", node.tasks.length, "tasks for node", node.id, "showOnAllFlows:", node.config.showOnAllFlows);
 
                 const publishMsg = {
                     id: node.id,
@@ -44,14 +45,19 @@ module.exports = function(RED) {
                     y: node.config.taskY,
                     titleWidth: node.config.titleWidth,
                     zIndex: 1000,
-                    showOnAllFlows: node.config.showOnAllFlows
+                    showOnAllFlows: node.config.showOnAllFlows,
+                    currentTabOnly: !node.config.showOnAllFlows
                 };
 
                 if (node.config.showOnAllFlows) {
+                    console.log("Publishing to update-all");
                     RED.comms.publish("vikunja-tasks/update-all", publishMsg, true);
                 } else {
+                    console.log("Publishing to update");
                     RED.comms.publish("vikunja-tasks/update", publishMsg, true);
                 }
+                
+                console.log("Current workspace:", RED.workspaces.active());
 
             } catch (error) {
                 node.status({ fill: 'red', shape: 'dot', text: 'error' });
