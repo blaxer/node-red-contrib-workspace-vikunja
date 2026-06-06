@@ -19,6 +19,7 @@
         table.style.border = "1px solid #4A90E2";
         table.style.borderRadius = "4px";
         table.style.background = "#fff";
+        table.style.borderSpacing = "0";
         table.dataset.nodeId = nodeId;
 
         const tr = document.createElement("tr");
@@ -30,12 +31,14 @@
         tdTitle.style.fontSize = "13px";
         tdTitle.style.width = titleWidth + "px";
         tdTitle.style.wordWrap = "break-word";
+        tdTitle.style.border = "1px solid #ddd";
         tdTitle.textContent = task.title || "";
 
         const tdButtons = document.createElement("td");
         tdButtons.style.padding = "6px 4px";
         tdButtons.style.textAlign = "right";
         tdButtons.style.whiteSpace = "nowrap";
+        tdButtons.style.border = "1px solid #ddd";
 
         const toggleBtn = document.createElement("button");
         toggleBtn.style.background = "none";
