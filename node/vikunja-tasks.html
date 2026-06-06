@@ -260,12 +260,6 @@
         });
         document.addEventListener("mouseup", function() {
             dragging = false;
-            // Save position to node context via backend API
-            fetch("/vikunja-tasks/" + nodeId + "/position", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ x: x, y: y })
-            }).then(r => r.json()).then(d => console.log("Position saved:", d)).catch(e => console.error("Position save error:", e));
         });
 
         const workspace = document.querySelector("#red-ui-workspace-chart");
@@ -321,7 +315,9 @@ RED.nodes.registerType('vikunja-tasks', {
         showCompleted: { value: false },
         refreshInterval: { value: 0, validate: RED.validators.number() },
         titleWidth: { value: 200 },
-        zIndex: { value: 800 }
+        zIndex: { value: 800 },
+        taskX: { value: 100 },
+        taskY: { value: 100 }
     },
     inputs: 1,
     outputs: 1,
@@ -362,6 +358,13 @@ RED.nodes.registerType('vikunja-tasks', {
 <div class="form-row">
     <label>Refresh (min)</label>
     <input type="number" id="node-input-refreshInterval" placeholder="0 = disabled" style="width:100px;" min="0">
+</div>
+
+<div class="form-row">
+    <label>X Position</label>
+    <input type="number" id="node-input-taskX" style="width:100px;">
+    <label style="margin-left:10px;">Y Position</label>
+    <input type="number" id="node-input-taskY" style="width:100px;">
 </div>
 
 <div class="form-row">

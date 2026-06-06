@@ -71,10 +71,7 @@ module.exports = function(RED) {
                 const postData = JSON.stringify(taskData);
                 return makeRequest({
                     path: `/api/v1/projects/${projectId}/tasks`,
-                    method: 'POST',
-                    headers: {
-                        'Content-Length': Buffer.byteLength(postData)
-                    }
+                    method: 'PUT'
                 }, postData);
             },
 
