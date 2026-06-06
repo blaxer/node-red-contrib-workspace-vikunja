@@ -22,6 +22,10 @@ module.exports = function(RED) {
         node.tasks = [];
         node.tabId = node.z;
         node.showOnAllFlows = config.showOnAllFlows || false;
+        
+        console.log("Vikunja node initialized:", node.id);
+        console.log("tabId:", node.tabId);
+        console.log("showOnAllFlows:", node.showOnAllFlows);
 
         function publishState() {
             const publishMsg = {
@@ -35,6 +39,7 @@ module.exports = function(RED) {
                 tabId: node.tabId,
                 currentTabOnly: !node.showOnAllFlows
             };
+            console.log("publishState called for node:", node.id, "showOnAllFlows:", node.showOnAllFlows);
             RED.comms.publish("vikunja-tasks/update", publishMsg, true);
         }
 
