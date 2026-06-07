@@ -1,0 +1,49 @@
+[
+    {
+        "id": "vikunja-tasks-all-1",
+        "type": "vikunja-tasks",
+        "z": "flow-1",
+        "name": "Global Tasks",
+        "vikunjaUrl": "https://try.vikunja.io",
+        "projectId": "",
+        "token": "",
+        "showCompleted": false,
+        "showOnAllFlows": true,
+        "refreshInterval": 5,
+        "taskX": 100,
+        "taskY": 100,
+        "titleWidth": 200
+    },
+    {
+        "id": "inject-all-refresh",
+        "type": "inject",
+        "z": "flow-1",
+        "name": "Refresh",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "payload": "refresh",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": ""
+    },
+    {
+        "id": "debug-all",
+        "type": "debug",
+        "z": "flow-1",
+        "name": "Tasks Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto"
+    }
+]
