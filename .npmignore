@@ -1,0 +1,29 @@
+# Documentation files (keep README.md)
+PROJECT_PLAN.md
+VIKUNJA_API_REFERENCE.md
+
+# Development files
+.git/
+.gitignore
+.npmignore
+*.md
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+coverage/
+*.test.js
+__tests__/
+
+# Build output
+dist/
+build/
