@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-workspace-vikunja",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Node-RED node to display and manage Vikunja tasks on the workspace canvas",
   "main": "node/vikunja-tasks.js",
   "node-red": {
