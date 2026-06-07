@@ -5,8 +5,6 @@ A Node-RED node to display and manage Vikunja tasks directly on the workspace ca
 [![Node-RED](https://img.shields.io/badge/Node--RED-v3.0.0+-blue.svg)](https://nodered.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-![Tasks Display](docs/images/tasks-display.png)
-
 ## Features
 
 - 📋 **Display Tasks**: Show Vikunja tasks directly on your Node-RED workspace
@@ -177,17 +175,7 @@ When the "Show on all flows" option is enabled:
 
 ## Screenshots
 
-### Task List with Descriptions
-
-![Task List](docs/images/tasks-list.png)
-
-### Collapsible Header
-
-![Collapsible Header](docs/images/collapsible-header.png)
-
-### Complete Workflow
-
-![Complete Workflow](docs/images/complete-workflow.png)
+*Note: Screenshots would be shown here when the project is running in Node-RED.*
 
 ## Development
 
