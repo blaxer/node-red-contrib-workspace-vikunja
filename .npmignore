@@ -1,11 +1,11 @@
-# Documentation files
+# Documentation files (keep README.md)
 PROJECT_PLAN.md
 VIKUNJA_API_REFERENCE.md
 
 # Development files
 .git/
 .gitignore
-*.md
+.npmignore
 
 # IDE files
 .idea/
