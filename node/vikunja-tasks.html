@@ -511,27 +511,69 @@ RED.nodes.registerType('vikunja-tasks', {
 </script>
 
 <script type="text/html" data-help-name="vikunja-tasks">
-    <p>A Node-RED node to display and manage Vikunja tasks directly on the workspace.</p>
+    <p>A Node-RED node to display and manage Vikunja tasks directly on the workspace canvas.</p>
+    
     <h3>Features</h3>
     <ul>
-        <li>Display tasks in a simple table on the Node-RED workspace canvas</li>
+        <li>Display tasks from Vikunja on the Node-RED workspace</li>
         <li>Toggle task completion by clicking the widget</li>
-        <li>Edit task details</li>
-        <li>Delete tasks directly from the workspace</li>
+        <li>Add, edit, and delete tasks directly from the workspace</li>
         <li>Drag the task container to reposition</li>
-        <li>Click the arrow to collapse/expand tasks</li>
+        <li>Click the arrow to collapse/expand all tasks</li>
         <li>Click on a task title to expand/collapse its description</li>
-        <li>Auto-refresh support</li>
-        <li>Option to show tasks on all flows</li>
+        <li>Auto-refresh support with configurable interval</li>
+        <li>Show tasks on all flows option</li>
     </ul>
-    <h3>Description</h3>
-    <p>Task descriptions are displayed in a collapsible section below each task title. Click on the task title to toggle the description view. Descriptions support HTML formatting including lists, paragraphs, and other rich text elements.</p>
-    <p>When <b>Show on all flows</b> is enabled, the task list will be displayed on every flow in the workspace, not just the flow containing this node. All task actions (toggle, edit, delete) are still controlled by the original node.</p>
-    <h3>Configuration</h3>
+    
+    <h3>Task Actions</h3>
+    <p>Click on a task to perform the following actions:</p>
     <ul>
-        <li><b>URL</b>: Your Vikunja server URL</li>
-        <li><b>Project ID</b>: ID of the project to display tasks from</li>
-        <li><b>API Token</b>: Your Vikunja API token</li>
+        <li><b>Title</b> - Toggle description visibility</li>
+        <li><b>✓ button</b> - Toggle task completion status</li>
+        <li><b>✎ button</b> - Edit task title</li>
+        <li><b>× button</b> - Delete task (with confirmation)</li>
+    </ul>
+    
+    <h3>Configuration</h3>
+    <p>The node requires the following configuration:</p>
+    <ul>
+        <li><b>URL</b> - Your Vikunja server URL (e.g., <code>https://try.vikunja.io</code>)</li>
+        <li><b>Project ID</b> - ID of the project to display tasks from</li>
+        <li><b>API Token</b> - Your Vikunja API token (create in Vikunja Settings → API Tokens)</li>
+        <li><b>Show Completed</b> - Toggle to show/hide completed tasks</li>
+        <li><b>Show on all flows</b> - Display tasks on every flow in the workspace</li>
+        <li><b>Refresh</b> - Auto-refresh interval in minutes (0 = disabled)</li>
+        <li><b>X/Y Position</b> - Initial position of the task container</li>
+        <li><b>Title Width</b> - Width of the task title column in pixels</li>
+    </ul>
+    
+    <h3>Input Messages</h3>
+    <p>The node accepts the following input messages:</p>
+    <table>
+        <tr><th>Payload</th><th>Description</th></tr>
+        <tr><td><code>'refresh'</code></td><td>Force refresh tasks</td></tr>
+        <tr><td><code>{ action: 'add', title: '...' }</code></td><td>Add a new task</td></tr>
+        <tr><td><code>{ action: 'add', title: '...', description: '...' }</code></td><td>Add a new task with description</td></tr>
+        <tr><td><code>{ action: 'toggle', taskId: 123 }</code></td><td>Toggle task completion</td></tr>
+        <tr><td><code>{ action: 'delete', taskId: 123 }</code></td><td>Delete a task</td></tr>
+        <tr><td><code>{ action: 'update', taskId: 123, data: {...} }</code></td><td>Update task properties</td></tr>
+    </table>
+    
+    <h3>Output</h3>
+    <p>The node sends messages with all tasks in <code>msg.payload</code>.</p>
+    
+    <h3>Task Descriptions</h3>
+    <p>Task descriptions support HTML formatting and are displayed in a collapsible section below each task title. Click on the task title to expand/collapse the description.</p>
+    
+    <h3>Example</h3>
+    <p>To add a new task with a description:</p>
+    <pre><code class="language-json">{
+    "payload": {
+        "action": "add",
+        "title": "New Task",
+        "description": "Task with <b>HTML</b> support"
+    }
+}</code></pre>
         <li><b>Show Completed</b>: Toggle to show/hide completed tasks</li>
         <li><b>Show on all flows</b>: Display tasks on every flow in the workspace</li>
         <li><b>Refresh</b>: Auto-refresh interval in minutes (0 = disabled)</li>

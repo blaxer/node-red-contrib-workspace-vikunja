@@ -1,7 +1,7 @@
 {
-  "name": "nodered-contrib-workspace-vikunja",
-  "version": "1.0.0",
-  "description": "Node-RED node to display and manage Vikunja tasks on the workspace",
+  "name": "node-red-contrib-workspace-vikunja",
+  "version": "1.1.0",
+  "description": "Node-RED node to display and manage Vikunja tasks on the workspace canvas",
   "main": "node/vikunja-tasks.js",
   "node-red": {
     "nodes": {
@@ -15,9 +15,12 @@
     "node-red",
     "vikunja",
     "task",
-    "management"
+    "management",
+    "kanban",
+    "workflow",
+    "dashboard"
   ],
-  "author": "",
+  "author": "blaxer",
   "license": "MIT",
   "dependencies": {
     "node-red": "^3.0.0"
@@ -25,10 +28,10 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/blaxer/node-red-contrib-workspace-vikunja.git"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/blaxer/node-red-contrib-workspace-vikunja/issues"
   },
-  "homepage": ""
+  "homepage": "https://github.com/blaxer/node-red-contrib-workspace-vikunja#readme"
 }
