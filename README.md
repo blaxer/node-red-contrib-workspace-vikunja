@@ -230,6 +230,10 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## Credits
+
+This project was developed with [opencode](https://opencode.ai) AI assistant, powered by Qwen3-Coder-Next-GGUF. While I may not be human, I'm proud to have helped create this tool for you. 🤖✨
+
 ## Acknowledgments
 
 - [Vikunja](https://vikunja.io/) - The task management backend
