@@ -5,6 +5,8 @@ A Node-RED node to display and manage Vikunja tasks directly on the workspace ca
 [![Node-RED](https://img.shields.io/badge/Node--RED-v3.0.0+-blue.svg)](https://nodered.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+![Vikunja Tasks](docs/images/vikunja.png)
+
 ## Features
 
 - 📋 **Display Tasks**: Show Vikunja tasks directly on your Node-RED workspace
